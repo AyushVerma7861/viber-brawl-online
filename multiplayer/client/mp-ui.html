@@ -1,0 +1,87 @@
+<!-- =========================================================================
+     Viber Brawl — MULTIPLAYER SCREENS
+     Injected just before the loader. The solo screens above are untouched.
+     ========================================================================= -->
+
+<!-- ------------------------------------------------------ CREATE / JOIN ---- -->
+<div class="screen" id="scrMP">
+  <div class="panel" style="max-width:520px;">
+    <h2 class="title2">MULTIPLAYER</h2>
+    <p class="sub">2–4 players · one arena · last Viber standing</p>
+
+    <div class="mp-field">
+      <label class="mp-label" for="mpName">YOUR NAME</label>
+      <input id="mpName" class="mp-input" maxlength="14" autocomplete="off" spellcheck="false" placeholder="VIBER">
+    </div>
+
+    <button class="btn green" id="btnCreateRoom" style="margin-top:12px;">CREATE ROOM</button>
+
+    <div class="mp-or"><span>OR JOIN A ROOM</span></div>
+
+    <div class="mp-field">
+      <label class="mp-label" for="mpCode">ROOM CODE</label>
+      <input id="mpCode" class="mp-input mp-code" maxlength="6" autocomplete="off" spellcheck="false"
+             autocapitalize="characters" placeholder="X7K4Q">
+    </div>
+
+    <button class="btn blue" id="btnJoinRoom">JOIN ROOM</button>
+
+    <div class="mp-msg" id="mpMsg"></div>
+
+    <button class="btn small" id="btnMpBack" style="margin-top:10px;">BACK</button>
+  </div>
+</div>
+
+<!-- ------------------------------------------------------------- LOBBY ---- -->
+<div class="screen" id="scrLobby">
+  <div class="panel" style="max-width:940px;">
+    <div class="mp-head">
+      <div>
+        <div class="mp-roomlbl">ROOM CODE</div>
+        <div class="mp-room" id="mpRoomCode">-----</div>
+      </div>
+      <div class="mp-headright">
+        <div class="mp-net" id="mpNet">connecting…</div>
+        <button class="mp-copybtn" id="btnCopyInvite">COPY INVITE LINK</button>
+      </div>
+    </div>
+
+    <h2 class="title2" style="margin-top:14px;">PLAYERS</h2>
+    <div class="mp-slots" id="mpSlots"></div>
+    <div class="mp-waitlist" id="mpWaitlist"></div>
+
+    <h2 class="title2" style="margin-top:14px;">CHOOSE YOUR VIBER</h2>
+    <p class="sub" id="mpLobbySub">Each Viber can only be picked by one player.</p>
+    <div class="mp-chargrid" id="mpCharGrid"></div>
+
+    <div class="row">
+      <button class="btn green" id="btnReady" style="flex:1;">READY</button>
+      <button class="btn blue" id="btnStartMatch" style="flex:1;">START MATCH</button>
+      <button class="btn small" id="btnLeaveRoom" style="flex:0.7;">LEAVE</button>
+    </div>
+    <div class="mp-msg" id="mpLobbyMsg"></div>
+  </div>
+</div>
+
+<!-- ----------------------------------------------------------- ACCOUNT ---- -->
+<div class="screen" id="scrAccount">
+  <div class="panel" style="max-width:560px;">
+    <h2 class="title2">ACCOUNT</h2>
+    <p class="sub" id="acctSub">Playing with an account keeps your name, your stats and your progress.</p>
+    <div id="acctState"></div>
+    <div class="mp-msg" id="acctMsg"></div>
+    <button class="btn small" id="btnAcctBack" style="margin-top:12px;">BACK</button>
+  </div>
+</div>
+
+<!-- ----------------------------------------------------------- PROFILE ---- -->
+<div class="screen" id="scrProfile">
+  <div class="panel" style="max-width:760px;">
+    <h2 class="title2">PROFILE</h2>
+    <div id="profileState"></div>
+    <button class="btn small" id="btnProfileBack" style="margin-top:16px;">BACK</button>
+  </div>
+</div>
+
+<!-- -------------------------------------------------- in-match banner ---- -->
+<div class="mp-banner" id="mpBanner"></div>
