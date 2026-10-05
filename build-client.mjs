@@ -32,6 +32,42 @@ const LAYER = path.join(ROOT, 'multiplayer', 'client', 'mp-layer.js');
 const md5 = (s) => crypto.createHash('md5').update(s).digest('hex');
 const read = (p) => fs.readFileSync(p, 'utf8');
 
+/* ---------------------------------------------------------------------------
+   The original game file is the INPUT to this build. If it is not present the
+   build cannot regenerate the multiplayer page — but the multiplayer page is
+   already built and committed, so a missing input is not fatal.
+
+   That matters in practice: this build also runs on Cloudflare, where a partial
+   upload can leave a file behind. Failing there with a raw ENOENT told the user
+   nothing; this says exactly what happened and what to do.
+   --------------------------------------------------------------------------- */
+if (!fs.existsSync(ORIGINAL)) {
+  if (fs.existsSync(OUT)) {
+    console.log('');
+    console.log('  ┌─────────────────────────────────────────────────────────────┐');
+    console.log('  │ NOTE: the original game file is missing from this checkout. │');
+    console.log('  └─────────────────────────────────────────────────────────────┘');
+    console.log('');
+    console.log('  missing : ' + path.relative(ROOT, ORIGINAL).replace(/\\/g, '/'));
+    console.log('  found   : ' + path.relative(ROOT, OUT).replace(/\\/g, '/') + ' (already built)');
+    console.log('');
+    console.log('  Skipping the rebuild and using the committed game page, which is');
+    console.log('  identical to what this step would have produced.');
+    console.log('');
+    console.log('  To rebuild from source in future, re-upload the public/ folder.');
+    console.log('');
+    process.exit(0);
+  }
+  console.error('');
+  console.error('  BUILD FAILED: neither the original game file nor a built game page');
+  console.error('  is present. The public/ folder did not upload correctly.');
+  console.error('');
+  console.error('  expected: ' + path.relative(ROOT, ORIGINAL).replace(/\\/g, '/'));
+  console.error('            ' + path.relative(ROOT, OUT).replace(/\\/g, '/'));
+  console.error('');
+  process.exit(1);
+}
+
 const src = read(ORIGINAL);
 const css = read(CSS);
 const ui = read(UI);
