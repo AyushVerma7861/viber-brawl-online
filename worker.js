@@ -51,6 +51,18 @@ export default {
       return new Response(null, { status: 204, headers: CORS });
     }
 
+    /* ------------------------------------------------------------- the root -- */
+    /* The bare address has no page of its own — the game lives at
+       /viber-brawl-multiplayer. Without this, anyone opening the root (which is
+       exactly where Cloudflare's dashboard "Visit site" button points, and where
+       a shared link lands if someone drops the filename) sees a 404 and assumes
+       the whole thing is broken. */
+    if (path === '/' || path === '') {
+      const to = new URL(request.url);
+      to.pathname = '/viber-brawl-multiplayer';
+      return Response.redirect(to.toString(), 302);
+    }
+
     /* ------------------------------------------------------------ health -- */
     if (path === '/api/health') {
       return json({
