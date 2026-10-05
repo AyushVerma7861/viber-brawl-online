@@ -1,0 +1,7 @@
+# Cloudflare assets headers.
+# The shared gameplay core is fetched cross-origin by the game page when the
+# front end is hosted somewhere other than this Worker (e.g. Cloudflare Pages).
+/shared/sim.js
+  Access-Control-Allow-Origin: *
+  Content-Type: application/javascript; charset=utf-8
+  Cache-Control: public, max-age=60

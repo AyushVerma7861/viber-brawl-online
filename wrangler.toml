@@ -1,0 +1,93 @@
+# =============================================================================
+# Viber Brawl — Cloudflare-native multiplayer
+#
+#   Worker  ──►  Durable Object (one instance == one battle room)
+#                       └── WebSocket per player
+#
+# Local:   npx wrangler dev            -> http://localhost:8787
+# Deploy:  npx wrangler deploy         -> https://<name>.<subdomain>.workers.dev
+# =============================================================================
+
+name = "viber-brawl-multiplayer"
+main = "multiplayer/src/worker.js"
+compatibility_date = "2025-07-18"
+
+# Give the Worker a public <name>.<subdomain>.workers.dev address. Without this
+# there would be no shareable link, which is the whole point of deploying.
+workers_dev = true
+
+# ---------------------------------------------------------------------------
+# Durable Object binding.
+# BattleRoom is the ONE class that owns a room's authoritative game loop.
+# ---------------------------------------------------------------------------
+[durable_objects]
+bindings = [
+  { name = "BATTLE_ROOM", class_name = "BattleRoom" }
+]
+
+# ---------------------------------------------------------------------------
+# Migration. `new_sqlite_classes` is required for Durable Objects on the
+# Workers FREE plan (SQLite-backed storage). Change to `new_classes` only if
+# you are on a paid plan and specifically want the legacy KV-backed storage.
+# ---------------------------------------------------------------------------
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["BattleRoom"]
+
+# ---------------------------------------------------------------------------
+# Static assets (the game itself). The Worker script still handles /ws and
+# /api/*; anything that matches a file in ./public is served directly.
+# ---------------------------------------------------------------------------
+[assets]
+directory = "public"
+binding = "ASSETS"
+
+# ---------------------------------------------------------------------------
+# D1 — accounts, sessions, profiles, progression, match history and analytics.
+#
+# `database_id` below is a PLACEHOLDER. Once, before your first deploy:
+#
+#     npx wrangler d1 create viber-brawl-db
+#
+# then paste the id it prints into the line below.
+#
+# Local development needs none of that: `wrangler dev` and
+# `npx wrangler d1 ... --local` use a local SQLite file under .wrangler/state.
+# ---------------------------------------------------------------------------
+[[d1_databases]]
+binding = "DB"
+database_name = "viber-brawl-db"
+database_id = "fbc63b4a-1831-459b-96af-82df78b0f378"
+migrations_dir = "multiplayer/db/migrations"
+
+# ---------------------------------------------------------------------------
+# Logs — `npx wrangler tail` shows room joins, disconnects and match results.
+# ---------------------------------------------------------------------------
+[observability]
+enabled = true
+
+# ---------------------------------------------------------------------------
+# Vars.
+#   SIM_DEBUG = "1"  -> the Durable Object logs why each swing connected or
+#                       missed (distance, dy, facing, cone dot). Useful when a
+#                       player reports "my attacks do nothing". Off by default.
+#
+#   AUTH_PASSWORD    -> "1" enables email + password sign-in.
+#                       ⚠️  THIS REQUIRES THE WORKERS PAID PLAN ($5/month).
+#                       Hashing a password with PBKDF2 costs 200-400ms of CPU,
+#                       and the FREE plan allows only 10ms per request, so
+#                       sign-up/sign-in would fail with an error 1102.
+#                       Set it to "0" to run OAuth-only on the free plan —
+#                       Google and Discord sign-in cost no CPU at all.
+#
+# OAuth credentials are SECRETS, not vars. Set them with:
+#     npx wrangler secret put GOOGLE_CLIENT_ID
+#     npx wrangler secret put GOOGLE_CLIENT_SECRET
+#     npx wrangler secret put DISCORD_CLIENT_ID
+#     npx wrangler secret put DISCORD_CLIENT_SECRET
+# A provider only appears as a button once BOTH of its values are present, so
+# the game works with zero, one or both configured.
+# ---------------------------------------------------------------------------
+[vars]
+SIM_DEBUG = "0"
+AUTH_PASSWORD = "1"
