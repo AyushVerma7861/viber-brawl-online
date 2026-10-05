@@ -26,9 +26,6 @@
   },
   "devDependencies": {
     "wrangler": "^3.114.0",
-    "playwright-core": "^1.63.0",
-    "@esbuild/win32-x64": "^0.17.19",
-    "@cloudflare/workerd-windows-64": "^1.20250718.0",
-    "@img/sharp-win32-x64": "^0.33.5"
+    "playwright-core": "^1.63.0"
   }
 }
