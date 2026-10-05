@@ -244,11 +244,38 @@ and commit. Cloudflare rebuilds and updates automatically.
 |---|---|---|
 | Deploy log mentions `database_id` | The id in `wrangler.toml` is still the zeros | Redo step 1, re-upload `wrangler.toml` |
 | Deploy log can't find `wrangler.toml` | The files went in one folder too deep | Re-upload the *contents*, not the folder |
+| `npm error EBADPLATFORM` | A Windows-only package is listed as *required* | See below |
+| `npm ci ... can only install packages when your package.json and package-lock.json are in sync` | The lockfile was regenerated on Windows and lost the Linux entries | See below |
 | Build fails | Usually the build command | Clear the Build command box, redeploy |
 | The page loads but rooms don't work | The Durable Object failed to start | Worker → **Logs** tab, tell me what it says |
 | Google/Discord button missing | Not both values set | Redo step 6 |
 | `redirect_uri_mismatch` | The address in Google/Discord doesn't match exactly | It must match character for character |
 | Sign-up fails with an error | Password sign-in is on but you're on the free plan | See below |
+
+### About those two npm errors
+
+Your PC is Windows. Cloudflare's build machines are Linux. Some tools ship a
+separate package per operating system (`@esbuild/win32-x64`,
+`@cloudflare/workerd-linux-64` and so on).
+
+There are two ways this goes wrong, and this project is set up to avoid both:
+
+1. **Listed as a *required* dependency** → npm refuses to install on the wrong
+   operating system. (`EBADPLATFORM`)
+2. **Listed as *optional*, but missing from the lockfile** → npm refuses because
+   the two files disagree. (`npm ci ... not in sync`)
+
+The fix for both is already applied: `package.json` declares **all 46 platform
+variants as `optionalDependencies`**, so npm records every platform in the
+lockfile and then installs only the one that matches the machine it is on.
+Windows skips the Linux ones; Linux skips the Windows ones. Neither fails.
+
+> **Never run `npm install` on this project on Windows and then upload
+> `package-lock.json`.** npm only writes the entries for the machine it runs on,
+> which silently strips every other platform out of the lockfile — and that is
+> exactly what caused the second error. If you ever do need to regenerate it, the
+> `optionalDependencies` block in `package.json` is what keeps all 46 entries
+> present, so regenerate from the copy in the zip rather than from scratch.
 
 **About the free plan.** The game ships with email + password sign-in switched
 on, and that needs Cloudflare's $5/month plan. If you're on the free plan,
